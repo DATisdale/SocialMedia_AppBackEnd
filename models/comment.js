@@ -22,7 +22,6 @@ const postSchema = new mongoose.Schema(
 
 function validatePost(post){
     const schema = Joi.object({
-        postId: Joi.string().min(2).max(50).required(),
         text: Joi.string().required(),
     });
     return schema.validate(post);
