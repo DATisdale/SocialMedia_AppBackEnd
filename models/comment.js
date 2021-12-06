@@ -11,13 +11,14 @@ const replySchema = new mongoose.Schema(
 
 const postSchema = new mongoose.Schema(
     {
-        postId:{type: String, require: true},
         text:{type: String, required: true},
         likes:{type: Number, default: 0},
         dislikes:{type: Number, default: 0},
         replies:{type: [replySchema], default: []}
     }
 )
+
+
 
 function validatePost(post){
     const schema = Joi.object({

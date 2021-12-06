@@ -58,7 +58,7 @@ router.post("/:postId/replies", async (req, res) => {
         const reply = new Reply({
             text: req.body.text,
             likes: req.body.likes,
-            dislikes: req.body.dislikes,
+            dislikes: req.body.dislikes
         });
 
         post.replies.push(reply);
