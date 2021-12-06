@@ -19,7 +19,6 @@ router.post("/", async (req, res) => {
             return res.status(400).send(error);
 
         const post = new Post({
-            postId: req.body.postId,
             text: req.body.text,
         });
 
