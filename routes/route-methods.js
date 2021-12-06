@@ -11,11 +11,6 @@ router.get("/:postId", async (req, res) => {
         return res.status(500).send(`Internal Server Error: ${ex}`);
     }
 });
-router.get("PLACEHOLDER", async (req, res) => {
-    try {
-        const profile = await Signup.find();
-        return res.send(profile);
-    } catch(ex) {
 
 router.post("/", async (req, res) => {
     try {
