@@ -12,6 +12,15 @@ router.get("/:postId", async (req, res) => {
     }
 });
 
+router.get("/", async (req, res) => {
+    try {
+        const posts = await Post.find();
+        return res.send(posts);
+    } catch(ex) {
+        return res.status(500).send(`Internal Server Error: ${ex}`);
+    }
+});
+
 router.post("/", async (req, res) => {
     try {
         const { error } = validatePost(req.body);
