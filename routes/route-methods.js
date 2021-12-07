@@ -1,5 +1,5 @@
 const express = require("express");
-const{Reply, Post, validatePost}=require("../models/comment");
+const{Reply, Post, validatePost, Like}=require("../models/comment");
 const{Signup, validateSignup}= require("../models/signup")
 const router=express.Router();
 
@@ -19,7 +19,6 @@ router.post("/", async (req, res) => {
             return res.status(400).send(error);
 
         const post = new Post({
-            postId: req.body.postId,
             text: req.body.text,
         });
 
@@ -44,7 +43,7 @@ router.put("/:postId", async (req, res) => {
         if (!post)
             return res.status(400).send(`The post requested does not exist.`)
 
-        await Comment.save();
+        await Like.save();
 
         return res.send(post);
     }   catch (ex) {
@@ -58,7 +57,7 @@ router.post("/:postId/replies", async (req, res) => {
         const reply = new Reply({
             text: req.body.text,
             likes: req.body.likes,
-            dislikes: req.body.dislikes,
+            dislikes: req.body.dislikes
         });
 
         post.replies.push(reply);
