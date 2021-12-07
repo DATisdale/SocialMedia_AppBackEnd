@@ -18,14 +18,6 @@ const postSchema = new mongoose.Schema(
     }
 )
 
-const likesSchema = new mongoose.Schema(
-    {
-        likes:{type: Number, default: 0},
-        dislikes:{type: Number, default: 0},
-    }
-)
-
-
 
 function validatePost(post){
     const schema = Joi.object({
@@ -36,9 +28,7 @@ function validatePost(post){
 
 const Post = mongoose.model("Post", postSchema);
 const Reply = mongoose.model("Reply", replySchema);
-const Like = mongoose.model("Like", likesSchema);
 
 module.exports.Reply = Reply;
 module.exports.validatePost = validatePost;
 module.exports.Post = Post;
-module.exports.Like = Like;

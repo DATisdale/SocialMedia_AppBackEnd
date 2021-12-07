@@ -1,5 +1,5 @@
 const express = require("express");
-const{Reply, Post, validatePost, Like}=require("../models/comment");
+const{Reply, Post, validatePost}=require("../models/comment");
 const{Signup, validateSignup}= require("../models/signup")
 const router=express.Router();
 
@@ -51,8 +51,6 @@ router.put("/:postId", async (req, res) => {
 
         if (!post)
             return res.status(400).send(`The post requested does not exist.`)
-
-        await Like.save();
 
         return res.send(post);
     }   catch (ex) {
