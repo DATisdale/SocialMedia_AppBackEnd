@@ -4,6 +4,9 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const {postSchema} = require("./posts");
 
+
+
+
 const userSchema = mongoose.Schema({
   name: { type: String, required: true, minLength: 5, maxLength: 50 },
   email: {
@@ -15,7 +18,9 @@ const userSchema = mongoose.Schema({
   },
   password: { type: String, required: true, minLength: 8, maxLength: 1024 },
   isAdmin: { type: Boolean, required: true },
-  posts: {type: [postSchema], default: []}
+  posts: {type: [postSchema], default: []},
+  acceptedFriends: {type: [mongoose.Schema.Types.ObjectId], default: []},
+  pendingFriends: {type: [mongoose.Schema.Types.ObjectId], default: []}
 });
 
 userSchema.methods.generateAuthToken = function () {

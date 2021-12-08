@@ -92,9 +92,9 @@ router.delete("/:userId", [auth, admin], async (req, res) => {
 });
 
 //*Create a post for user
-router.post("/:userId/posts", async (req, res) => {
+router.post("/posts", [auth], async (req, res) => {
   try {
-      const user = await User.findById(req.params.userId);
+      const user = await User.findById(req.user._id);
       
       let post = new Post(req.body);
       const { error } = validatePost(req.body);
@@ -109,55 +109,56 @@ router.post("/:userId/posts", async (req, res) => {
   }
 });
 
-//*Find a post by Id
-router.get("/:postId", async (req, res) => {
-  try {
-      const posts = await Post.find();
-      return res.send(posts);
-  } catch(ex) {
-      return res.status(500).send(`Internal Server Error: ${ex}`);
-  }
-});
 
-//*Find all posts
-router.get("/", async (req, res) => {
+router.get("/posts/all", async (req, res) => {
   try {
-      const posts = await Post.find();
-      return res.send(posts);
+      const users = await User.find()
+
+      let posts = []
+      users.map(user => posts.push({userId: user._id, posts: user.posts}));
+
+      return res.send(posts);  
+
   } catch(ex) {
       return res.status(500).send(`Internal Server Error: ${ex}`);
   }
 });
 
 //*Adding likes and dislikes
-router.put("/:postId", async (req, res) => {
+router.put("/:userId/posts/:postId", async (req, res) => {
   try {
-      const post = await Post.findByIdAndUpdate(
-          req.params.postId,
-          {
-              ...req.body
-          },
-          { new: true }
-      );
-      if (!post)
-          return res.status(400).send(`The post requested does not exist.`)
-      return res.send(post);
+      const user = await User.findById(req.params.userId);
+
+      let thePost = user.posts.id(req.params.postId);
+
+      thePost = {...thePost, ...req.body}
+
+      await user.save()
+
+      return res.send(thePost);
   }   catch (ex) {
           return res.status(500).send(`Internal Server Error: ${ex}`)
   }
 });
 
-router.post("/:postId/replies", async (req, res) => {
+//*Replying to posts
+router.post("/:userId/posts/:postId/replies", async (req, res) => {
   try {
-      const post = await Post.findById(req.params.postId);
-      const reply = new Reply({
+    const user = await User.findById(req.params.userId);
+
+    let thePost = user.posts.id(req.params.postId);
+
+    const reply = new Reply({
           text: req.body.text,
           likes: req.body.likes,
           dislikes: req.body.dislikes
       });
-      post.replies.push(reply);
-      await post.save();
-      return res.send(post.replies);
+
+      thePost.replies.push(reply);
+
+      await user.save();
+
+      return res.send(thePost.replies);
   } catch (ex) {
       return res.status(500).send(`Internal Server Error: ${ex}`);
   }
