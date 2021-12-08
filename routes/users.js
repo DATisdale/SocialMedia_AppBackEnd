@@ -7,6 +7,8 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const router = express.Router();
 
+const{Reply, Post, validatePost} = require("../models/posts")
+
 //* POST register a new user
 router.post("/register", async (req, res) => {
   try {
@@ -88,5 +90,44 @@ router.delete("/:userId", [auth, admin], async (req, res) => {
     return res.status(500).send(`Internal Server Error: ${ex}`);
   }
 });
+
+//*Find a post by Id
+router.get("/:postId", async (req, res) => {
+  try {
+      const posts = await Post.find();
+      return res.send(posts);
+  } catch(ex) {
+      return res.status(500).send(`Internal Server Error: ${ex}`);
+  }
+});
+
+//*Find all posts
+router.get("/", async (req, res) => {
+  try {
+      const posts = await Post.find();
+      return res.send(posts);
+  } catch(ex) {
+      return res.status(500).send(`Internal Server Error: ${ex}`);
+  }
+});
+
+//*Create a post for user
+router.post("/:userId/posts", async (req, res) => {
+  try {
+      const user = await User.findById(req.params.userId);
+      
+      let post = new Post(req.body);
+      const { error } = validatePost(req.body);
+      if (error) 
+          return res.status(400).send(error);
+      user.posts.push(post);
+      
+      await user.save();
+      return res.send(user);
+  }   catch (ex) {
+      return res.status(500).send(`Internal Server Error: ${ex}`)
+  }
+});
+
 
 module.exports = router;

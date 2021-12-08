@@ -19,22 +19,27 @@ router.get("/", async (req, res) => {
         return res.status(500).send(`Internal Server Error: ${ex}`);
     }
 });
-router.post("/", async (req, res) => {
-    try {
-        const user = await User.findById(req.params.userId);
-
-        const { error } = validatePost(req.body);
-        if (error) 
-            return res.status(400).send(error);
-
-        let post = new Post(req.body);
-        user.posts.push(post);
-        await user.save();
-        return res.send(user);
-    }   catch (ex) {
-        return res.status(500).send(`Internal Server Error: ${ex}`)
-    }
-});
+// router.post("/:userId/posts", async (req, res) => {
+//     try {
+//         const user = await User.findById(req.params.userId);
+        
+//         let post = new Post(req.body);
+//         const { error } = validatePost(req.body);
+//         if (error) 
+//             return res.status(400).send(error);
+//         user.posts.push(post);
+        
+//         await user.save();
+//         return res.send(user);
+//     }   catch (ex) {
+//         return res.status(500).send(`Internal Server Error: ${ex}`)
+//     }
+//     const user = await User.findById(req.params.userId);
+//     let post = new Post(req.body);
+//     user.posts.push(post);
+//     await user.save;
+//     return res.send(user);
+// });
 router.put("/:postId", async (req, res) => {
     try {
         const post = await Post.findByIdAndUpdate(
