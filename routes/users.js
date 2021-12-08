@@ -91,6 +91,24 @@ router.delete("/:userId", [auth, admin], async (req, res) => {
   }
 });
 
+//*Create a post for user
+router.post("/:userId/posts", async (req, res) => {
+  try {
+      const user = await User.findById(req.params.userId);
+      
+      let post = new Post(req.body);
+      const { error } = validatePost(req.body);
+      if (error) 
+          return res.status(400).send(error);
+      user.posts.push(post);
+      
+      await user.save();
+      return res.send(user);
+  }   catch (ex) {
+      return res.status(500).send(`Internal Server Error: ${ex}`)
+  }
+});
+
 //*Find a post by Id
 router.get("/:postId", async (req, res) => {
   try {
@@ -111,23 +129,38 @@ router.get("/", async (req, res) => {
   }
 });
 
-//*Create a post for user
-router.post("/:userId/posts", async (req, res) => {
+//*Adding likes and dislikes
+router.put("/:postId", async (req, res) => {
   try {
-      const user = await User.findById(req.params.userId);
-      
-      let post = new Post(req.body);
-      const { error } = validatePost(req.body);
-      if (error) 
-          return res.status(400).send(error);
-      user.posts.push(post);
-      
-      await user.save();
-      return res.send(user);
+      const post = await Post.findByIdAndUpdate(
+          req.params.postId,
+          {
+              ...req.body
+          },
+          { new: true }
+      );
+      if (!post)
+          return res.status(400).send(`The post requested does not exist.`)
+      return res.send(post);
   }   catch (ex) {
-      return res.status(500).send(`Internal Server Error: ${ex}`)
+          return res.status(500).send(`Internal Server Error: ${ex}`)
   }
 });
 
+router.post("/:postId/replies", async (req, res) => {
+  try {
+      const post = await Post.findById(req.params.postId);
+      const reply = new Reply({
+          text: req.body.text,
+          likes: req.body.likes,
+          dislikes: req.body.dislikes
+      });
+      post.replies.push(reply);
+      await post.save();
+      return res.send(post.replies);
+  } catch (ex) {
+      return res.status(500).send(`Internal Server Error: ${ex}`);
+  }
+});
 
 module.exports = router;
