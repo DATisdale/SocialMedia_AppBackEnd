@@ -5,7 +5,7 @@ const connectDb = () => {
   mongoose
     .connect(config.get("mongoURI"), {
       useNewUrlParser: true,
-      useCreateIndex: true,
+      // useCreateIndex: true,
       useUnifiedTopology: true,
     })
     .then(() => console.log("Connected to MongoDb..."))
