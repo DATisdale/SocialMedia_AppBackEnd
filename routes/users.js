@@ -67,9 +67,18 @@ router.post("/login", async (req, res) => {
 });
 
 //* Get all users
-router.get("/", async (req, res) => {
+router.get("/", [auth], async (req, res) => {
   try {
     const users = await User.find();
+    return res.send(users);
+  } catch (ex) {
+    return res.status(500).send(`Internal Server Error: ${ex}`);
+  }
+});
+
+router.get("/:userId", [auth], async (req, res) => {
+  try {
+    const users = await User.findById(req.params.userId);
     return res.send(users);
   } catch (ex) {
     return res.status(500).send(`Internal Server Error: ${ex}`);
@@ -109,8 +118,8 @@ router.post("/posts", [auth], async (req, res) => {
   }
 });
 
-
-router.get("/posts/all", async (req, res) => {
+//*Find all posts (created by David and Pascal)
+router.get("/posts/all", [auth], async (req, res) => {
   try {
       const users = await User.find()
 
@@ -133,7 +142,7 @@ router.put("/:userId/posts/:postId", async (req, res) => {
 
       thePost = {...thePost, ...req.body}
 
-      await user.save()
+      await user  .save()
 
       return res.send(thePost);
   }   catch (ex) {
@@ -142,7 +151,7 @@ router.put("/:userId/posts/:postId", async (req, res) => {
 });
 
 //*Replying to posts
-router.post("/:userId/posts/:postId/replies", async (req, res) => {
+router.post("/:userId/posts/:postId/replies", [auth], async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
 
@@ -169,10 +178,9 @@ router.get("/:userId/pendingFriends/:friendId",[auth], async (req, res) => {
   
     const user = await User.findById(req.params.friendId);
     user.pendingFriends.push(req.params.userId);
-    await user.save()
-    return res.send(user.pendingFriends)
 
-    
+    await user.save()
+    return res.send(user.pendingFriends)   
 })
 
  router.get("/:yourId/acceptFriends/:userId",[auth], async(req, res)=>{
@@ -183,12 +191,10 @@ router.get("/:userId/pendingFriends/:friendId",[auth], async (req, res) => {
   user.acceptedFriends.push(req.params.userId);
   const friend = await User.findById(req.params.userId);
   friend.acceptedFriends.push(req.params.yourId);
+
   await user.save();
   await friend.save();
   return res.send([user,friend])
 })
-
-
-
 
 module.exports = router;
