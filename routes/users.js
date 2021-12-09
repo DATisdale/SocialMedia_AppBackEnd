@@ -165,7 +165,7 @@ router.post("/:userId/posts/:postId/replies", async (req, res) => {
 });
 
 //*Sending friend request
-router.post("/:userId/pendingFriends/:yourId",[auth], async (req, res) => {
+router.get("/:userId/pendingFriends/:yourId",[auth], async (req, res) => {
   
     const potentialFriend = await User.findById(req.params.userId);
     user.pendingFriends.push(req.params.yourId);
@@ -175,7 +175,7 @@ router.post("/:userId/pendingFriends/:yourId",[auth], async (req, res) => {
     
 })
 
-router.put("/:yourId/pendingFriends/:userId",[auth], async(req, res)=>{
+router.get("/:yourId/acceptFriends/:userId",[auth], async(req, res)=>{
   const user = await User.findById(req.params.yourID);
   const filteredFriends = user.pendingFriends.filter((pendingFriend)=>{
     return pendingFriend===(req.params.UserId);
