@@ -67,7 +67,7 @@ router.post("/login", async (req, res) => {
 });
 
 //* Get all users
-router.get("/", async (req, res) => {
+router.get("/", [auth], async (req, res) => {
   try {
     const users = await User.find();
     return res.send(users);
@@ -109,8 +109,8 @@ router.post("/posts", [auth], async (req, res) => {
   }
 });
 
-
-router.get("/posts/all", async (req, res) => {
+//*Find all posts (created by David and Pascal)
+router.get("/posts/all", [auth], async (req, res) => {
   try {
       const users = await User.find()
 
@@ -133,7 +133,7 @@ router.put("/:userId/posts/:postId", async (req, res) => {
 
       thePost = {...thePost, ...req.body}
 
-      await user.save()
+      await user  .save()
 
       return res.send(thePost);
   }   catch (ex) {
@@ -142,7 +142,7 @@ router.put("/:userId/posts/:postId", async (req, res) => {
 });
 
 //*Replying to posts
-router.post("/:userId/posts/:postId/replies", async (req, res) => {
+router.post("/:userId/posts/:postId/replies", [auth], async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
 
@@ -162,6 +162,25 @@ router.post("/:userId/posts/:postId/replies", async (req, res) => {
   } catch (ex) {
       return res.status(500).send(`Internal Server Error: ${ex}`);
   }
+});
+
+//*Creating a friend request
+router.put("/:userId/pendingFriends/:yourId", [auth], async (req, res) => {
+  const user = await User.findById(req.params.userId);
+  user.pendingFriends.push(req.params.yourId);
+  await user.save();
+  return res.send(user.pendingFriends);
+});
+
+//*Accepting a friend request
+router.put("/:yourId/acceptedFriends/:userId", [auth], async (req, res) => {
+  const user = await User.findById(req.params.yourId);
+  const filteredFriends = user.pendingFriends.filter((pendingFriend) => {
+    return pendingFriend === (req.params.userId);
+  });
+  user.acceptedFriends.push(filteredFriends[0]);
+  await user.save();
+  return res.send(user.acceptedFriends);
 });
 
 module.exports = router;
