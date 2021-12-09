@@ -76,6 +76,15 @@ router.get("/", [auth], async (req, res) => {
   }
 });
 
+router.get("/:userId", [auth], async (req, res) => {
+  try {
+    const users = await User.findById(req.params.userId);
+    return res.send(users);
+  } catch (ex) {
+    return res.status(500).send(`Internal Server Error: ${ex}`);
+  }
+});
+
 //* DELETE a single user from the database
 router.delete("/:userId", [auth, admin], async (req, res) => {
   try {
@@ -164,23 +173,23 @@ router.post("/:userId/posts/:postId/replies", [auth], async (req, res) => {
   }
 });
 
-//*Creating a friend request
-router.put("/:userId/pendingFriends/:yourId", [auth], async (req, res) => {
-  const user = await User.findById(req.params.userId);
-  user.pendingFriends.push(req.params.yourId);
-  await user.save();
-  return res.send(user.pendingFriends);
-});
+//*Sending friend request
+router.get("/:userId/pendingFriends/:yourId",[auth], async (req, res) => {
+  
+    const user = await User.findById(req.params.userId);
+    user.pendingFriends.push(req.params.yourId);
+    await user.save()
+    return res.send(user.pendingFriends)   
+})
 
-//*Accepting a friend request
-router.put("/:yourId/acceptedFriends/:userId", [auth], async (req, res) => {
-  const user = await User.findById(req.params.yourId);
-  const filteredFriends = user.pendingFriends.filter((pendingFriend) => {
-    return pendingFriend === (req.params.userId);
-  });
+router.get("/:yourId/pendingFriends/:userId",[auth], async(req, res)=>{
+  const user = await User.findById(req.params.yourID);
+  const filteredFriends = user.pendingFriends.filter((pendingFriend)=>{
+    return pendingFriend===(req.params.UserId);
+  })
   user.acceptedFriends.push(filteredFriends[0]);
   await user.save();
-  return res.send(user.acceptedFriends);
-});
+  return res.send(user.acceptedFriends)
+})
 
 module.exports = router;
