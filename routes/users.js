@@ -164,4 +164,28 @@ router.post("/:userId/posts/:postId/replies", async (req, res) => {
   }
 });
 
+//*Sending friend request
+router.post("/:userId/pendingFriends/:yourId",[auth], async (req, res) => {
+  
+    const potentialFriend = await User.findById(req.params.userId);
+    user.pendingFriends.push(req.params.yourId);
+    await user.save()
+    return res.send(user.pendingFriends)
+
+    
+})
+
+router.put("/:yourId/pendingFriends/:userId",[auth], async(req, res)=>{
+  const user = await User.findById(req.params.yourID);
+  const filteredFriends = user.pendingFriends.filter((pendingFriend)=>{
+    return pendingFriend===(req.params.UserId);
+  })
+  user.acceptedFriends.push(filterFriends);
+  await user.save();
+  return res.send(user.acceptedFriends)
+})
+
+
+
+
 module.exports = router;
