@@ -165,24 +165,27 @@ router.post("/:userId/posts/:postId/replies", async (req, res) => {
 });
 
 //*Sending friend request
-router.get("/:userId/pendingFriends/:yourId",[auth], async (req, res) => {
+router.get("/:userId/pendingFriends/:friendId",[auth], async (req, res) => {
   
-    const potentialFriend = await User.findById(req.params.userId);
-    user.pendingFriends.push(req.params.yourId);
+    const user = await User.findById(req.params.friendId);
+    user.pendingFriends.push(req.params.userId);
     await user.save()
     return res.send(user.pendingFriends)
 
     
 })
 
-router.get("/:yourId/acceptFriends/:userId",[auth], async(req, res)=>{
-  const user = await User.findById(req.params.yourID);
-  const filteredFriends = user.pendingFriends.filter((pendingFriend)=>{
-    return pendingFriend===(req.params.UserId);
-  })
-  user.acceptedFriends.push(filterFriends);
+ router.get("/:yourId/acceptFriends/:userId",[auth], async(req, res)=>{
+   const user = await User.findById(req.params.yourId);
+   const indexOfFriend = user.pendingFriends.findIndex(e=>e===req.params.userId)
+  user.pendingFriends.splice (indexOfFriend,1);
+
+  user.acceptedFriends.push(req.params.userId);
+  const friend = await User.findById(req.params.userId);
+  friend.acceptedFriends.push(req.params.yourId);
   await user.save();
-  return res.send(user.acceptedFriends)
+  await friend.save();
+  return res.send([user,friend])
 })
 
 
