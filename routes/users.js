@@ -173,6 +173,11 @@ router.post("/:userId/posts/:postId/replies", [auth], async (req, res) => {
   }
 });
 
+router.get('/current', [auth], async (req, res) => {
+  const user = await User.findById(req.user._id);
+  return res.send(user);
+})
+
 //*Sending friend request
 router.get("/:userId/pendingFriends/:friendId",[auth], async (req, res) => {
   
