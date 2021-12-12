@@ -173,8 +173,9 @@ router.post("/:userId/posts/:postId/replies", [auth], async (req, res) => {
   }
 });
 
-router.get('/current', [auth], async (req, res) => {
-  const user = await User.findById(req.user._id);
+//*Route for current user
+router.get('/current/:currentUserId', async (req, res) => {
+  const user = await User.findById(req.params.currentUserId);
   return res.send(user);
 })
 
